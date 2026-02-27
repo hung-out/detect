@@ -43,6 +43,7 @@ from .block import (
     C2fPSA,
     C3Ghost,
     C3k2,
+    C3k2_m,
     C3x,
     CBFuse,
     CBLinear,
@@ -59,7 +60,6 @@ from .block import (
     ResNetLayer,
     SCDown,
     TorchVision,
-    C3k2_m,
 )
 from .conv import (
     CBAM,
@@ -138,6 +138,7 @@ __all__ = (
     "C2fPSA",
     "C3Ghost",
     "C3k2",
+    "C3k2_m",
     "C3x",
     "CBFuse",
     "CBLinear",
@@ -188,5 +189,4 @@ __all__ = (
     "YOLOESegment",
     "YOLOESegment26",
     "v10Detect",
-    "C3k2_m",
 )
