@@ -31,12 +31,14 @@ __all__ = (
     "BNContrastiveHead",
     "Bottleneck",
     "BottleneckCSP",
+    "BottleneckLight",
     "C2f",
     "C2fAttn",
     "C2fCIB",
     "C2fPSA",
     "C3Ghost",
     "C3k2",
+    "C3k2_m",
     "C3x",
     "CBFuse",
     "CBLinear",
@@ -52,8 +54,6 @@ __all__ = (
     "ResNetLayer",
     "SCDown",
     "TorchVision",
-    "C3k2_m",
-    "BottleneckLight"
 )
 
 
@@ -481,7 +481,8 @@ class Bottleneck(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Apply bottleneck with optional shortcut connection."""
         return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
-    
+
+
 class BottleneckLight(nn.Module):
     """Standard bottleneck."""
 
@@ -1131,12 +1132,7 @@ class C3k2_m(C2f):
             self.bottleneck = BottleneckLight(self.c, self.c, shortcut, g)
         else:
             self.bottleneck = GhostBottleneck(self.c, self.c, shortcut, g)
-        self.m = nn.ModuleList(
-            C3k(self.c, self.c, 2, shortcut, g)
-            if c3k
-            else self.bottleneck
-            for _ in range(n)
-        )
+        self.m = nn.ModuleList(C3k(self.c, self.c, 2, shortcut, g) if c3k else self.bottleneck for _ in range(n))
         if attn:
             self.m.add_module(PSABlock(self.c, attn_ratio=0.5, num_heads=max(self.c // 64, 1)))
 
@@ -1145,6 +1141,7 @@ class C3k2_m(C2f):
         y = list(self.cv1(x).chunk(2, 1))
         y.extend(m(y[-1]) for m in self.m)
         return self.cv2(torch.cat(y, 1))
+
 
 class C3k2(C2f):
     """Faster Implementation of CSP Bottleneck with 2 convolutions."""
